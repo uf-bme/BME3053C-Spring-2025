@@ -1,0 +1,121 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fftpack import fft, ifft
+from scipy.signal import find_peaks
+
+def generate_ecg_data(duration, sampling_rate=250):
+    def generate_ecg_pulse(duration, sampling_rate):
+        t = np.linspace(0, duration, int(duration * sampling_rate), endpoint=False)
+        # P wave
+        p_wave = 0.15 * np.sin(2 * np.pi * 1.5 * t) * np.exp(-((t - 0.1) ** 2) / 0.005)
+        # QRS complex
+        qrs_complex = np.zeros_like(t)
+        qrs_complex[(t > 0.2) & (t < 0.25)] = -0.3
+        qrs_complex[(t > 0.25) & (t < 0.3)] = 1.0
+        qrs_complex[(t > 0.3) & (t < 0.35)] = -0.2
+        # T wave
+        t_wave = 0.3 * np.sin(2 * np.pi * 0.75 * (t - 0.45)) * np.exp(-((t - 0.45) ** 2) / 0.015)
+        # Combine all components
+        pulse = p_wave + qrs_complex + t_wave
+        # Add high-frequency noise to the pulse
+        high_freq_noise = 0.05 * np.sin(2 * np.pi * 50 * t)
+        pulse += high_freq_noise
+        return pulse
+ 
+
+    # Generate a single ECG pulse
+    single_pulse = generate_ecg_pulse(0.8, sampling_rate)
+ 
+
+    # Repeat the pulse to create a longer ECG signal
+    num_pulses = int(duration / 0.8)
+    ecg_data = np.tile(single_pulse, num_pulses)
+ 
+
+    # Add more noise to make it more realistic
+    noise = np.random.normal(0, 0.05, len(ecg_data))  # Increased noise amplitude
+    ecg_data += noise
+ 
+
+    # Add baseline wander
+    t = np.linspace(0, duration, len(ecg_data), endpoint=False)
+    baseline_wander = 0.1 * np.sin(2 * np.pi * 0.1 * t)
+    ecg_data += baseline_wander
+ 
+
+    # Add power line interference
+    power_line_interference = 0.05 * np.sin(2 * np.pi * 60 * t)  # 60 Hz interference
+    ecg_data += power_line_interference
+ 
+
+    # Ensure the length of ecg_data matches the desired duration
+    ecg_data = ecg_data[:int(duration * sampling_rate)]
+ 
+
+    return ecg_data
+ 
+
+ecg_data = generate_ecg_data(10, 250)
+def generate_ecg_data(duration, sampling_rate=250):
+    def generate_ecg_pulse(duration, sampling_rate):
+        t = np.linspace(0, duration, int(duration * sampling_rate), endpoint=False)
+        # P wave
+        p_wave = 0.15 * np.sin(2 * np.pi * 1.5 * t) * np.exp(-((t - 0.1) ** 2) / 0.005)
+        # QRS complex
+        qrs_complex = np.zeros_like(t)
+        qrs_complex[(t > 0.2) & (t < 0.25)] = -0.3
+        qrs_complex[(t > 0.25) & (t < 0.3)] = 1.0
+        qrs_complex[(t > 0.3) & (t < 0.35)] = -0.2
+        # T wave
+        t_wave = 0.3 * np.sin(2 * np.pi * 0.75 * (t - 0.45)) * np.exp(-((t - 0.45) ** 2) / 0.015)
+        # Combine all components
+        pulse = p_wave + qrs_complex + t_wave
+        # Add high-frequency noise to the pulse
+        high_freq_noise = 0.05 * np.sin(2 * np.pi * 50 * t)
+        pulse += high_freq_noise
+        return pulse
+
+    # Generate a single ECG pulse
+    single_pulse = generate_ecg_pulse(0.8, sampling_rate)
+
+    # Repeat the pulse to create a longer ECG signal
+    num_pulses = int(duration / 0.8)
+    ecg_data = np.tile(single_pulse, num_pulses)
+
+    # Add more noise to make it more realistic
+    noise = np.random.normal(0, 0.05, len(ecg_data))  # Increased noise amplitude
+    ecg_data += noise
+
+    # Add baseline wander
+    t = np.linspace(0, duration, len(ecg_data), endpoint=False)
+    baseline_wander = 0.1 * np.sin(2 * np.pi * 0.1 * t)
+    ecg_data += baseline_wander
+
+    # Add power line interference
+    power_line_interference = 0.05 * np.sin(2 * np.pi * 60 * t)  # 60 Hz interference
+    ecg_data += power_line_interference
+
+    # Ensure the length of ecg_data matches the desired duration
+    ecg_data = ecg_data[:int(duration * sampling_rate)]
+
+    return ecg_data
+
+ecg_data = generate_ecg_data(10, 250)
+
+# Plot the generated ECG signal
+plt.plot(ecg_data)
+plt.title('Generated ECG Signal')
+plt.xlabel('Samples')
+plt.ylabel('Amplitude')
+plt.grid()
+plt.show()
+def plot_ecg(ecg_data, sampling_rate=250):
+    plt.figure(figsize=(12, 6))
+    plt.plot(ecg_data, label='ECG Signal')
+    plt.title('Generated ECG Signal')
+    plt.xlabel('Samples')
+    plt.ylabel('Amplitude')
+    plt.grid()
+    plt.legend()
+    plt.show()
+plot_ecg(ecg_data)
